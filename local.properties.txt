@@ -1,0 +1,1 @@
+sdk.dir=C:\Users\robde\AppData\Local\Android\Sdk
