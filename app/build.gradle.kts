@@ -14,14 +14,14 @@ android {
     }
 
     namespace = "tech.robd.musicalnotetiming"
-    compileSdk = 36 // Updated to latest
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "tech.robd.musicalnotetiming"
         minSdk = 26
-        targetSdk = 36 // Corrected from 36 (which doesn't exist yet)
+        targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
