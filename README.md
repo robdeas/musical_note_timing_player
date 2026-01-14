@@ -45,7 +45,7 @@ cd musical_note_timing_player
 ./gradlew assembleDebug
 ```
 
-🤝 Contributing
+## 🤝 Contributing
 Contributions are welcome!
 
 Fork the Project.
@@ -58,7 +58,7 @@ Push to the Branch (git push origin feature/AmazingFeature).
 
 Open a Pull Request.
 
-📄 License
+##  License
 Distributed under the GNU General Public License v3.0. See LICENSE for more information.
 
 Created by Rob Deas
