@@ -43,6 +43,7 @@ To build the project locally:
 git clone [https://github.com/robdeas/musical_note_timing_player.git](https://github.com/robdeas/musical_note_timing_player.git)
 cd musical_note_timing_player
 ./gradlew assembleDebug
+```
 
 🤝 Contributing
 Contributions are welcome!
