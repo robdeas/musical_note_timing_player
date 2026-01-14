@@ -1,47 +1,53 @@
 name: Android Release
-
 on:
   push:
     tags:
-      - 'v*' # Trigger this when you push a tag starting with 'v' (like v0.1.0)
+      - 'v*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Needed to upload the APK to the release
+      contents: write
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'gradle'
+          cache: gradle
 
-      - name: Grant Execute Permission
+      - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build Release APK
         run: ./gradlew assembleRelease
 
-      - name: Sign APK
-        uses: r0adkll/sign-android-release@v1
-        id: sign_app
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-          buildToolsVersion: "34.0.0"
+      - name: Sign and Zipalign APK
+        run: |
+          # 1. Find the Android Build Tools path dynamically
+          BUILD_TOOLS_PATH=$(ls -d $ANDROID_HOME/build-tools/* | tail -1)
+          echo "Using Build Tools from: $BUILD_TOOLS_PATH"
+          
+          # 2. Decode the signing key from your secrets
+          echo "${{ secrets.SIGNING_KEY }}" | base64 -d > release.jks
+          
+          # 3. Zipalign the APK (Optimizes the file)
+          $BUILD_TOOLS_PATH/zipalign -v 4 app/build/outputs/apk/release/app-release-unsigned.apk app-release-final.apk
+          
+          # 4. Sign the APK using apksigner
+          $BUILD_TOOLS_PATH/apksigner sign --ks release.jks \
+            --ks-key-alias "${{ secrets.ALIAS }}" \
+            --ks-pass pass:"${{ secrets.KEY_STORE_PASSWORD }}" \
+            --key-pass pass:"${{ secrets.KEY_PASSWORD }}" \
+            --out app-release-final.apk app-release-final.apk
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          files: app-release-final.apk
           generate_release_notes: true
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
